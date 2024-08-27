@@ -1,63 +1,59 @@
 #!/usr/bin/python3
-'''N queens'''
+"""N-Queens puzzle Function"""
 import sys
 
 
-def is_safe(board, row, col):
-    """Check if it's safe to place a queen at board[row][col]."""
-    for i in range(col):
-        if board[row][i] == 1:
-            return False
+def print_board(board, n):
+    """prints nqueen position"""
+    b = []
 
-    for i, j in zip(range(row, -1, -1), range(col, -1, -1)):
-        if board[i][j] == 1:
-            return False
-
-    for i, j in zip(range(row, len(board)), range(col, -1, -1)):
-        if board[i][j] == 1:
-            return False
-
-    return True
+    for i in range(n):
+        for j in range(n):
+            if j == board[i]:
+                b.append([i, j])
+    print(b)
 
 
-def solve_nqueens_util(board, col, solutions):
-    """Utilize backtracking to solve the N Queens problem."""
-    if col >= len(board):
-        solutions.append([[i, board[i].index(1)] for i in range(len(board))])
-        return True
-
-    res = False
-    for i in range(len(board)):
-        if is_safe(board, i, col):
-            board[i][col] = 1
-            res = solve_nqueens_util(board, col + 1, solutions) or res
-            board[i][col] = 0  # backtrack
-
-    return res
+def safe_position(board, i, j, r):
+    """Function checks if its safe for the nqueen"""
+    return board[i] in (j, j - i + r, i - r + j)
 
 
-def solve_nqueens(N):
-    """Solve the N Queens problem and print the solutions."""
-    board = [[0 for _ in range(N)] for _ in range(N)]
-    solutions = []
-    solve_nqueens_util(board, 0, solutions)
-    for solution in solutions:
-        print(solution)
+def determine_positions(board, row, n):
+    """Function wiill find safe places to allocate the nqueen """
+    if row == n:
+        print_board(board, n)
+
+    else:
+        for j in range(n):
+            allowed = True
+            for i in range(row):
+                if safe_position(board, i, j, row):
+                    allowed = False
+            if allowed:
+                board[row] = j
+                determine_positions(board, row + 1, n)
 
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: nqueens N")
-        sys.exit(1)
+def create_board(size):
+    """creates board"""
+    return [0 * size for i in range(size)]
 
-    try:
-        N = int(sys.argv[1])
-    except ValueError:
-        print("N must be a number")
-        sys.exit(1)
 
-    if N < 4:
-        print("N must be at least 4")
-        sys.exit(1)
+if len(sys.argv) != 2:
+    print("Usage: nqueens N")
+    exit(1)
 
-    solve_nqueens(N)
+try:
+    n = int(sys.argv[1])
+except BaseException:
+    print("N must be a number")
+    exit(1)
+
+if (n < 4):
+    print("N must be at least 4")
+    exit(1)
+
+board = create_board(int(n))
+row = 0
+determine_positions(board, row, int(n))
